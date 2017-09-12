@@ -131,8 +131,7 @@ function confirmReservation(req, res) {
     }
   })
 
-  functi
-  on verifyParams() {
+  function verifyParams() {
     if(!validations.confirmReservationValidation(req.body)) {
       return res.json({success:false, message: 'Missing parameters'});
     }
