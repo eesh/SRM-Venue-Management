@@ -1,4 +1,4 @@
-const validations = require('../utils/validations')
+const validations = require('../validations/auth')
 const AuthLogics = require('../logics/auth')
 
 function registerUser (req, res) {

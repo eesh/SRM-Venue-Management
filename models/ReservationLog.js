@@ -3,7 +3,8 @@ const Schema = mongoose.Schema
 
 var ReservationSchema = new mongoose.Schema({
   reservationId : Schema.Types.ObjectId,
-  confirmed : Boolean,
+  action : String,
+  actionBy : Schema.Types.ObjectId,
   reason : String
 });
 

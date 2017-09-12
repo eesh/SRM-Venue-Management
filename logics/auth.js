@@ -2,121 +2,155 @@ const AuthToken = require('../models/AuthToken')
 const User = require('../models/User')
 const utils = require('../utils/utils')
 
-function validateUser(token) {
+var functions = {
 
-  function onUserFound(user, err) {
-    if(err) return null
-    if(!user) return null
-    return user;
-  }
-
-  function onAuthToken(authToken, err) {
-    if(err) return null
-    if(!authToken) return null
-    if(authToken.expiry < new Date.now) return null
-    User.find({ id : authToken.userId }, onUserFound)
-  }
-
-  AuthToken.find({ token : token }, onAuthToken)
-}
-
-
-function performUserRegistration(params, callback) {
-
-  function onPasswordGenerated(error, password) {
-    if(error) {
-      callback(error, null);
-      return
+  validateUser: function (token, callback) {
+    function onUserFound(err, user) {
+      if(err) return callback(err, null)
+      if(!user) return callback(new Error('No user found'), null);
+      callback(null, user);
     }
-    params.password = password
-    var user = new User(params)
-    user.save(function (err, user) {
-      if(err || !user) {
-        callback(err, user)
+
+    function onAuthToken(authToken, err) {
+      if(err) return callback(err, null)
+      if(!authToken) return callback(new Error('No user found'), null);
+      if(authToken.expiry < new Date.now) {
+        authToken.remove();
+        callback(new Error('Auth Token expired'), null)
         return
       }
-      sendRegistrationEmail(user.email, function () {
-        callback(err, user)
+      User.find({ id : authToken.userId }, onUserFound)
+    }
+
+    AuthToken.find({ token : token }, onAuthToken)
+  },
+
+  performUserRegistration: function (params, callback) {
+
+    function onPasswordGenerated(error, password) {
+      if(error) {
+        callback(error, null);
+        return
+      }
+      params.password = password
+      var user = new User(params)
+      user.save(function (err, user) {
+        if(err || !user) {
+          callback(err, user)
+          return
+        }
+        sendRegistrationEmail(user.email, function () {
+          callback(err, user)
+        })
       })
-    })
-  }
-  utils.hashPassword(params.password, onPasswordGenerated)
-}
+    }
+    utils.hashPassword(params.password, onPasswordGenerated)
+  },
 
-function performLogin(params, callback) {
-  var attempts = 3;
+  performLogin: function (params, callback) {
+    var attempts = 3;
 
-  function addAuthToken(params) {
-    var authToken = new AuthToken(params)
-    authToken.save(function (err, authToken) {
-      if(err) {
-        if(err.code == 11000) {
-          console.log(err)
-          if(attempts < 0) {
-            callback(new Error('Try logging in later'), null);
+    function addAuthToken(params) {
+      var authToken = new AuthToken(params)
+      authToken.save(function (err, authToken) {
+        if(err) {
+          if(err.code == 11000) {
+            console.log(err)
+            if(attempts < 0) {
+              callback(new Error('Try logging in later'), null);
+              return;
+            }
+            generateAuthToken(params.userid);
+          } else {
+            callback(err, null);
             return;
           }
-          generateAuthToken(params.userid);
-        } else {
+        }
+        if(!authToken) {
+          callback(new Error('Null authToken returned'), null);
+          return;
+        }
+        callback(null, authToken);
+      })
+    }
+
+    function generateAuthToken(userid) {
+      attempts --;
+      var params = {
+        token : utils.uuid(64),
+        userId : userid,
+        expiry : Date.now() + 3 * 86400 * 1000
+      }
+
+      AuthToken.findOneAndRemove({ userId : userid }, function (err, removedDoc) {
+        if(err) {
           callback(err, null);
           return;
         }
-      }
-      if(!authToken) {
-        callback(new Error('Null authToken returned'), null);
-        return;
-      }
-      callback(null, authToken);
-    })
-  }
-
-  function generateAuthToken(userid) {
-    attempts --;
-    var params = {
-      token : utils.uuid(64),
-      userId : userid,
-      expiry : Date.now() + 3 * 86400 * 1000
+        addAuthToken(params);
+      });
     }
 
-    AuthToken.findOneAndRemove({ userId : userid }, function (err, removedDoc) {
-      if(err) {
-        callback(err, null);
-        return;
-      }
-      addAuthToken(params);
-    });
-  }
-
-  function onPasswordGenerated(error, password) {
-    if(error) {
-      callback(error, null);
-      return
-    }
-    var searchFields = {
-      'email' : params.email,
-      'password' : password
-    };
-    
-    User.findOne(searchFields, function (err, user) {
-      if(err) {
-        console.log(err)
-        callback(err, null);
+    function onPasswordGenerated(error, password) {
+      if(error) {
+        callback(error, null);
         return
       }
-      if(!user) {
-        console.log(user);
-        callback(new Error('User not found'), null);
+      var searchFields = {
+        'email' : params.email,
+        'password' : password
+      };
+
+      User.findOne(searchFields, function (err, user) {
+        if(err) {
+          console.log(err)
+          callback(err, null);
+          return
+        }
+        if(!user) {
+          console.log(user);
+          callback(new Error('User not found'), null);
+          return;
+        }
+        console.log(user.id);
+        generateAuthToken(user.id);
+      })
+    }
+    utils.hashPassword(params.password, onPasswordGenerated)
+  },
+
+  sendRegistrationEmail: function (email, callback) {
+    callback();
+  },
+
+  isAdmin: function (token, callback) {
+
+    function onTokenFound(authToken) {
+      User.findOne({id:authToken.userId}, function (err, user) {
+        if(err) {
+          callback(false);
+          return;
+        }
+        if(!user) {
+          callback(false);
+          return;
+        }
+        callback(user.type == 'admin');
+      })
+    }
+
+    AuthToken.findOne({token : token}, function (err, authToken) {
+      if(err) {
+        callback(false);
         return;
       }
-      console.log(user.id);
-      generateAuthToken(user.id);
-    })
+      if(!authToken) {
+        callback(false);
+        return;
+      }
+      onTokenFound(authToken);
+    });
   }
-  utils.hashPassword(params.password, onPasswordGenerated)
 }
 
-function sendRegistrationEmail(email, callback) {
-  callback();
-}
-
-module.exports = { validateUser, performUserRegistration, performLogin }
+module.exports = functions

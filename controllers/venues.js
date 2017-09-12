@@ -1,5 +1,5 @@
 const VenueLogics = require('../logics/venues')
-const validations = require('../utils/validations')
+const validations = require('../validations/venues')
 
 function getAllVenues(req, res) {
 
