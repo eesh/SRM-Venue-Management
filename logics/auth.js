@@ -128,14 +128,17 @@ var functions = {
     function onTokenFound(authToken) {
       User.findOne({id:authToken.userId}, function (err, user) {
         if(err) {
-          callback(false);
+          callback(err);
           return;
         }
         if(!user) {
-          callback(false);
+          callback(new Error('No user found'));
           return;
         }
-        callback(user.type == 'admin');
+        if(user.type != 'admin') {
+          callback(new Error('Unauthorized'));
+        }
+        callback(null, user);
       })
     }
 
