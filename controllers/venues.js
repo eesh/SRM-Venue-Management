@@ -29,7 +29,7 @@ var functions = {
     }
     VenueLogics.addVenue(params, function (err, doc) {
       if(err) {
-        res.json({ success : false, message: err })
+        res.json({ success : false, message: err.message })
         return
       }
       res.json({ success : true, venueDetails: venue })
@@ -37,7 +37,18 @@ var functions = {
   },
 
   editVenue : function (req, res) {
-    res.json({success: true, message: 'Api not ready'})
+    var params = {}
+    if(!validations.editVenueValidation(req.body)) {
+      return res.json({success : false, message : 'Invalid parameters'})
+    }
+    params = validations.sanitizeVenueFields(req.body);
+    VenueLogics.editVenue(params, function (err, venue) {
+      if(err) {
+        res.json({ success : false, message: err.message})
+        return
+      }
+      res.json({ success : true, venueDetails: venue })
+    })
   },
 
   deleteVenue : function (req, res) {
