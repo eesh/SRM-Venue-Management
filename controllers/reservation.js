@@ -2,6 +2,7 @@ const validations = require('../validations/reservation')
 const AuthLogics = require('../logics/auth')
 const ReservationLogics = require('../logics/reservation')
 
+
 function makeReservation(req, res) {
   var token = req.headers.token;
   var params = {};
@@ -113,11 +114,68 @@ function getAllReservations(req, res) {
 }
 
 function confirmReservation(req, res) {
-  res.json({success: true, message: 'Api not ready'})
+  var token = req.headers.token;
+  var params = {};
+  if(token == null) {
+    return res.json({ success : false, message : 'Unauthorized'})
+  }
+
+  AuthLogics.isAdmin(token, (error, user) => {
+    if(error) {
+      res.json({success:false, message: error.message})
+      return;
+    } else {
+      params = req.body;
+      params.userId = user.id;
+      verifyParams();
+    }
+  })
+
+  functi
+  on verifyParams() {
+    if(!validations.confirmReservationValidation(req.body)) {
+      return res.json({success:false, message: 'Missing parameters'});
+    }
+    ReservationLogics.confirmReservation(params, function (err, reservation) {
+      if(err) {
+        return res.json({ success : false, message : err.message });
+      }
+      res.json({ success : true, 'reservationDetails' : reservation })
+      return;
+    });
+  }
 }
 
 function rejectReservation(req, res) {
-  res.json({success: true, message: 'Api not ready'})
+  var token = req.headers.token;
+  var params = {};
+  if(token == null) {
+    return res.json({ success : false, message : 'Unauthorized'})
+  }
+
+  AuthLogics.isAdmin(token, (error, user) => {
+    if(error) {
+      res.json({success:false, message: error.message})
+      return;
+    } else {
+      params = req.body;
+      params.userId = user.id;
+      verifyParams();
+    }
+  })
+
+  function verifyParams() {
+    if(!validations.rejectReservationValidation(req.body)) {
+      return res.json({success:false, message: 'Missing parameters'});
+    }
+    ReservationLogics.rejectReservation(params, function (err, reservation) {
+      if(err) {
+        return res.json({ success : false, message : err.message });
+      }
+      res.json({ success : true, 'reservationDetails' : reservation })
+      return;
+    });
+  }
 }
 
 module.exports = { makeReservation, getReservation, updateReservation, cancelReservation, getAllReservations, confirmReservation, rejectReservation}
