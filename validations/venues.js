@@ -21,13 +21,11 @@ var functions = {
 
     editVenueValidation : function (params) {
       var count = 0
-      console.log(Object.keys(params))
       Object.keys(params).forEach(function(key) {
         if(venueFields.indexOf(key) != -1) {
           count ++
         }
       });
-      console.log(count)
       return count > 1
     }
 }

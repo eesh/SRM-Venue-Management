@@ -30,12 +30,18 @@ var functions = {
   },
 
   getReservations : function (params, callback) {
-    Reservation.find({by:params.userId}, function(err, reservation) {
+    Reservation.find({userId:params.userId}, function(err, reservation) {
       if(err) {
         return callback(err, null);
       }
       callback(null, reservation)
     });
+  },
+
+  editReservation : function (params, callback) {
+    var id = params.reservationId
+    delete params.reservationId
+    Reservation.findOneAndUpdate({_id : id}, { $set: params }, { new : true }, callback);
   }
 }
 

@@ -4,7 +4,7 @@ var UserSchema = new mongoose.Schema({
   name : String,
   email : { type: String, unique: true },
   password : String,
-  admin : Boolean,
+  type : String,
   department : String,
   totalReservations : Number
 });

@@ -11,18 +11,18 @@ var functions = {
       callback(null, user);
     }
 
-    function onAuthToken(authToken, err) {
+    function onAuthToken(err, authToken) {
       if(err) return callback(err, null)
       if(!authToken) return callback(new Error('No user found'), null);
-      if(authToken.expiry < new Date.now) {
+      if(authToken.expiry < Date.now()) {
         authToken.remove();
         callback(new Error('Auth Token expired'), null)
         return
       }
-      User.find({ id : authToken.userId }, onUserFound)
+      console.log(authToken, token)
+      User.findOne({ _id : authToken.userId }, onUserFound)
     }
-
-    AuthToken.find({ token : token }, onAuthToken)
+    AuthToken.findOne({ 'token' : token }, onAuthToken)
   },
 
   performUserRegistration: function (params, callback) {
