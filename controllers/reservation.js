@@ -2,179 +2,194 @@ const validations = require('../validations/reservation')
 const AuthLogics = require('../logics/auth')
 const ReservationLogics = require('../logics/reservation')
 
+var functions = {
 
-function makeReservation(req, res) {
-  var token = req.headers.token;
-  var params = {};
-  if(token == null) {
-    return res.json({ success : false, message : 'Unauthorized'})
-  }
-
-  AuthLogics.validateUser(token, (error, user) => {
-    if(error) {
-      res.json({success:false, message: error.message})
-      return;
-    } else {
-      params = req.body;
-      params.userId = user.id;
-      params.userType = user.type;
-      verifyParams();
+  makeReservation: function (req, res) {
+    var token = req.headers.token;
+    var params = {};
+    if(token == null) {
+      return res.json({ success : false, message : 'Unauthorized'})
     }
-  })
-
-  function verifyParams() {
-    if(!validations.makeReservationValidation(params)) {
-      return res.json({success:false, message: 'Missing parameters'})
-    }
-    performRegistration();
-  }
-
-  function next() {
-    ReservationLogics.makeReservation(params, function (err, reservation) {
-      if(err) {
-        return res.json({ success : false, message : err.message });
+    AuthLogics.validateUser(token, (error, user) => {
+      if(error) {
+        res.json({success:false, message: error.message})
+        return;
+      } else {
+        params = req.body;
+        params.userId = user.id;
+        params.userType = user.type;
+        verifyParams();
       }
-      res.json({ success : true, reservationDetails: reservation })
-      return;
     })
-  }
-}
 
-function getReservation(req, res) {
-  res.json({success: true, message: 'Api not ready'})
-}
-
-function updateReservation(req, res) {
-  res.json({success: true, message: 'Api not ready'})
-}
-
-function cancelReservation(req, res) {
-  var token = req.headers.token;
-  var params = {};
-  if(token == null) {
-    return res.json({ success : false, message : 'Unauthorized'})
-  }
-
-  AuthLogics.validateUser(token, (error, user) => {
-    if(error) {
-      res.json({success:false, message: error.message})
-      return;
-    } else {
-      params = req.body;
-      params.userId = user.id;
-      params.userType = user.type;
-      verifyParams();
-    }
-  })
-
-  function verifyParams() {
-    if(!validations.cancelReservationValidation(params)) {
-      return res.json({success:false, message: 'Missing parameters'})
-    }
-    cancelReservation();
-  }
-
-  function cancelReservation() {
-    ReservationLogics.cancelReservation(params, function (err, reservation) {
-      if(err) {
-        return res.json({ success : false, message : err.message });
+    function verifyParams() {
+      if(!validations.makeReservationValidation(params)) {
+        console.log(params)
+        return res.json({success:false, message: 'Missing parameters'})
       }
-      res.json({ success : true, message: 'Reservaton cancelled', reservationDetails : reservation })
-      return;
+      next();
+    }
+
+    function next() {
+      ReservationLogics.makeReservation(params, function (err, reservation) {
+        if(err) {
+          return res.json({ success : false, message : err.message });
+        }
+        res.json({ success : true, reservationDetails: reservation })
+        return;
+      })
+    }
+  },
+
+  getReservation: function (req, res) {
+    res.json({success: true, message: 'Api not ready'})
+  },
+
+  updateReservation: function (req, res) {
+    var params = {}
+    if(!validations.editReservationValidation(req.body)) {
+      return res.json({success : false, message : 'Invalid parameters'})
+    }
+    params = validations.sanitizeReservationFields(req.body);
+    ReservationLogics.editReservation(params, function (err, venue) {
+      if(err) {
+        res.json({ success : false, message: err.message})
+        return
+      }
+      res.json({ success : true, reservationDetails: venue })
     })
-  }
-}
+  },
 
-function getAllReservations(req, res) {
-  var token = req.headers.token;
-  var params = {};
-  if(token == null) {
-    return res.json({ success : false, message : 'Unauthorized'})
-  }
-
-  AuthLogics.validateUser(token, (error, user) => {
-    if(error) {
-      res.json({success:false, message: error.message})
-      return;
-    } else {
-      params.userId = user.id;
-      getReservations();
+  cancelReservation: function (req, res) {
+    var token = req.headers.token;
+    var params = {};
+    if(token == null) {
+      return res.json({ success : false, message : 'Unauthorized'})
     }
-  })
 
-  function getReservations() {
-    ReservationLogics.getReservations(params, function (err, reservations) {
-      if(err) {
-        return res.json({ success : false, message : err.message });
+    AuthLogics.validateUser(token, (error, user) => {
+      if(error) {
+        res.json({success:false, message: error.message})
+        return;
+      } else {
+        params = req.body;
+        params.userId = user.id;
+        params.userType = user.type;
+        verifyParams();
       }
-      res.json({ success : true, 'reservations' : reservations })
-      return;
     })
-  }
-}
 
-function confirmReservation(req, res) {
-  var token = req.headers.token;
-  var params = {};
-  if(token == null) {
-    return res.json({ success : false, message : 'Unauthorized'})
-  }
-
-  AuthLogics.isAdmin(token, (error, user) => {
-    if(error) {
-      res.json({success:false, message: error.message})
-      return;
-    } else {
-      params = req.body;
-      params.userId = user.id;
-      verifyParams();
-    }
-  })
-
-  function verifyParams() {
-    if(!validations.confirmReservationValidation(req.body)) {
-      return res.json({success:false, message: 'Missing parameters'});
-    }
-    ReservationLogics.confirmReservation(params, function (err, reservation) {
-      if(err) {
-        return res.json({ success : false, message : err.message });
+    function verifyParams() {
+      if(!validations.cancelReservationValidation(params)) {
+        return res.json({success:false, message: 'Missing parameters'})
       }
-      res.json({ success : true, 'reservationDetails' : reservation })
-      return;
-    });
-  }
-}
-
-function rejectReservation(req, res) {
-  var token = req.headers.token;
-  var params = {};
-  if(token == null) {
-    return res.json({ success : false, message : 'Unauthorized'})
-  }
-
-  AuthLogics.isAdmin(token, (error, user) => {
-    if(error) {
-      res.json({success:false, message: error.message})
-      return;
-    } else {
-      params = req.body;
-      params.userId = user.id;
-      verifyParams();
+      cancelReservation();
     }
-  })
 
-  function verifyParams() {
-    if(!validations.rejectReservationValidation(req.body)) {
-      return res.json({success:false, message: 'Missing parameters'});
+    function cancelReservation() {
+      ReservationLogics.cancelReservation(params, function (err, reservation) {
+        if(err) {
+          return res.json({ success : false, message : err.message });
+        }
+        res.json({ success : true, message: 'Reservaton cancelled', reservationDetails : reservation })
+        return;
+      })
     }
-    ReservationLogics.rejectReservation(params, function (err, reservation) {
-      if(err) {
-        return res.json({ success : false, message : err.message });
+  },
+
+  getAllReservations: function (req, res) {
+    var token = req.headers.token;
+    var params = {};
+    if(token == null) {
+      return res.json({ success : false, message : 'Unauthorized'})
+    }
+
+    AuthLogics.validateUser(token, (error, user) => {
+      if(error) {
+        res.json({success:false, message: error.message})
+        return;
+      } else {
+        params.userId = user.id;
+        getReservations();
       }
-      res.json({ success : true, 'reservationDetails' : reservation })
-      return;
-    });
+    })
+
+    function getReservations() {
+      ReservationLogics.getReservations(params, function (err, reservations) {
+        if(err) {
+          return res.json({ success : false, message : err.message });
+        }
+        res.json({ success : true, 'reservations' : reservations })
+        return;
+      })
+    }
+  },
+
+  confirmReservation: function (req, res) {
+    var token = req.headers.token;
+    var params = {};
+    if(token == null) {
+      return res.json({ success : false, message : 'Unauthorized'})
+    }
+
+    AuthLogics.isAdmin(token, (error, user) => {
+      if(error) {
+        res.json({success:false, message: error.message})
+        return;
+      } else {
+        params = req.body;
+        params.userId = user.id;
+        verifyParams();
+      }
+    })
+
+    function verifyParams() {
+      if(!validations.confirmReservationValidation(req.body)) {
+        return res.json({success:false, message: 'Missing parameters'});
+      }
+      ReservationLogics.confirmReservation(params, function (err, reservation) {
+        if(err) {
+          return res.json({ success : false, message : err.message });
+        }
+        res.json({ success : true, 'reservationDetails' : reservation })
+        return;
+      });
+    }
+  },
+
+  rejectReservation: function (req, res) {
+    var token = req.headers.token;
+    var params = {};
+    if(token == null) {
+      return res.json({ success : false, message : 'Unauthorized'})
+    }
+
+    AuthLogics.isAdmin(token, (error, user) => {
+      if(error) {
+        res.json({success:false, message: error.message})
+        return;
+      } else {
+        params = req.body;
+        params.userId = user.id;
+        verifyParams();
+      }
+    })
+
+    function verifyParams() {
+      if(!validations.rejectReservationValidation(req.body)) {
+        return res.json({success:false, message: 'Missing parameters'});
+      }
+      ReservationLogics.rejectReservation(params, function (err, reservation) {
+        if(err) {
+          return res.json({ success : false, message : err.message });
+        }
+        res.json({ success : true, 'reservationDetails' : reservation })
+        return;
+      });
+    }
   }
+
+
 }
 
-module.exports = { makeReservation, getReservation, updateReservation, cancelReservation, getAllReservations, confirmReservation, rejectReservation}
+module.exports = functions
