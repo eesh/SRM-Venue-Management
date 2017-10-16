@@ -4,8 +4,8 @@ var reservation = require('./reservation')
 
 var attachRoutes = function attachRoutes(app) {
   auth(app)
-  // venues(app)
-  // reservation(app)
+  venues(app)
+  reservation(app)
 }
 
 module.exports = attachRoutes
