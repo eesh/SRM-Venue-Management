@@ -27,6 +27,7 @@ var functions = {
     } else {
       params = req.body;
     }
+    console.log(params)
     VenueLogics.addVenue(params, function (err, doc) {
       if(err) {
         res.json({ success : false, message: err.message })
