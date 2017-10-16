@@ -2,7 +2,6 @@ var reservationController = require('../controllers/reservation')
 
 var init = function (app) {
   app.post('/reservation', reservationController.makeReservation)
-  app.get('/reservation', reservationController.getReservation)
   app.put('/reservation', reservationController.updateReservation)
   app.post('/reservation/cancel', reservationController.cancelReservation)
 

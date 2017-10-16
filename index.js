@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const routes = require('./routes')
 
-const SERVER_PORT = 3000
+const SERVER_PORT = 6767
 const MONGOOSE_SERVER = 'mongodb://localhost/srmvenuemgmt'
 
 

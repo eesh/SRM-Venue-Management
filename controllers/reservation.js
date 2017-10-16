@@ -24,7 +24,6 @@ var functions = {
 
     function verifyParams() {
       if(!validations.makeReservationValidation(params)) {
-        console.log(params)
         return res.json({success:false, message: 'Missing parameters'})
       }
       next();
@@ -39,10 +38,6 @@ var functions = {
         return;
       })
     }
-  },
-
-  getReservation: function (req, res) {
-    res.json({success: true, message: 'Api not ready'})
   },
 
   updateReservation: function (req, res) {

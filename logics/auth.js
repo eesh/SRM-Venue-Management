@@ -39,11 +39,13 @@ var functions = {
           callback(err, user)
           return
         }
-        sendRegistrationEmail(user.email, function () {
-          callback(err, user)
-        })
+        // sendRegistrationEmail(user.email, function () {
+        //   callback(err, user)
+        // })
+        callback(err, user)
       })
     }
+    // This executes first
     utils.hashPassword(params.password, onPasswordGenerated)
   },
 
@@ -75,7 +77,7 @@ var functions = {
     }
 
     function generateAuthToken(userid) {
-      attempts --;
+      attempts--;
       var params = {
         token : utils.uuid(64),
         userId : userid,
@@ -116,6 +118,8 @@ var functions = {
         generateAuthToken(user.id);
       })
     }
+
+    //this executes first
     utils.hashPassword(params.password, onPasswordGenerated)
   },
 
