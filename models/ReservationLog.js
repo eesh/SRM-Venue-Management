@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 var ReservationSchema = new mongoose.Schema({
   reservationId : Schema.Types.ObjectId,
   action : String,
-  actionBy : Schema.Types.ObjectId,
+  actionBy : { type: Schema.Types.ObjectId, ref: 'User' },
   reason : String
 });
 

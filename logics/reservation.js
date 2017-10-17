@@ -30,11 +30,11 @@ var functions = {
   },
 
   getReservations : function (params, callback) {
-    Reservation.find({userId:params.userId}, function(err, reservation) {
+    Reservation.find({}).populate({path: 'user', select:'name department'}).exec(function(err, reservations) {
       if(err) {
         return callback(err, null);
       }
-      callback(null, reservation)
+      callback(null, reservations);
     });
   },
 

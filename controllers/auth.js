@@ -41,7 +41,7 @@ function loginUser (req, res) {
       res.json({ success : false, message: err.message })
       return
     }
-    res.json({ success : true, tokenDetail: authToken })
+    res.json({ success : true, tokenDetails: authToken })
   })
 }
 

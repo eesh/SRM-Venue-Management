@@ -19,8 +19,7 @@ var functions = {
         callback(new Error('Auth Token expired'), null)
         return
       }
-      console.log(authToken, token)
-      User.findOne({ _id : authToken.userId }, onUserFound)
+      User.findOne({ _id : authToken.user }, onUserFound)
     }
     AuthToken.findOne({ 'token' : token }, onAuthToken)
   },
@@ -72,7 +71,9 @@ var functions = {
           callback(new Error('Null authToken returned'), null);
           return;
         }
-        callback(null, authToken);
+        AuthToken.populate(authToken, {path: 'user'}, function (err, doc) {
+          callback(null, doc);
+        })
       })
     }
 
@@ -80,11 +81,11 @@ var functions = {
       attempts--;
       var params = {
         token : utils.uuid(64),
-        userId : userid,
+        user : userid,
         expiry : Date.now() + 3 * 86400 * 1000
       }
 
-      AuthToken.findOneAndRemove({ userId : userid }, function (err, removedDoc) {
+      AuthToken.findOneAndRemove({ user : userid }, function (err, removedDoc) {
         if(err) {
           callback(err, null);
           return;
@@ -110,11 +111,9 @@ var functions = {
           return
         }
         if(!user) {
-          console.log(user);
           callback(new Error('User not found'), null);
           return;
         }
-        console.log(user.id);
         generateAuthToken(user.id);
       })
     }
@@ -130,7 +129,7 @@ var functions = {
   isAdmin: function (token, callback) {
 
     function onTokenFound(authToken) {
-      User.findOne({id:authToken.userId}, function (err, user) {
+      User.findOne({id:authToken.user}, function (err, user) {
         if(err) {
           callback(err);
           return;

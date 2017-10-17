@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 var ReservationSchema = new mongoose.Schema({
-  userId : Schema.Types.ObjectId,
+  user : { type: Schema.Types.ObjectId, ref: 'User' },
   startTime : Date,
   endTime : Date,
   duration : Number,

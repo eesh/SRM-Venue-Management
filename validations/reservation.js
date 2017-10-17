@@ -3,22 +3,22 @@ const reservationFields = ['reservationId', 'startTime', 'endTime', 'duration', 
 var functions = {
 
     confirmReservationValidation: function (params) {
-      if(params.reservationId == null || params.userId == null) return false;
+      if(params.reservationId == null || params.user == null) return false;
       return true;
     },
 
     rejectReservationValidation: function (params) {
-      if(params.reservationId == null || params.userId == null) return false;
+      if(params.reservationId == null || params.user == null) return false;
       return true;
     },
 
     cancelReservationValidation: function (params) {
-      if(params.reservationId == null || params.userId == null || params.userType == null) return false;
+      if(params.reservationId == null || params.user == null || params.userType == null) return false;
       return true;
     },
 
     makeReservationValidation: function (params) {
-      if(params.venueId == null || params.userId == null || params.startTime == null || params.endTime == null || params.duration == null || params.occasion == null) return false;
+      if(params.venueId == null || params.user == null || params.startTime == null || params.endTime == null || params.duration == null || params.occasion == null) return false;
       return true;
     },
 

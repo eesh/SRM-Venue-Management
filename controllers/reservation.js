@@ -16,7 +16,7 @@ var functions = {
         return;
       } else {
         params = req.body;
-        params.userId = user.id;
+        params.user = user.id;
         params.userType = user.type;
         verifyParams();
       }
@@ -68,7 +68,7 @@ var functions = {
         return;
       } else {
         params = req.body;
-        params.userId = user.id;
+        params.user = user.id;
         params.userType = user.type;
         verifyParams();
       }
@@ -104,7 +104,7 @@ var functions = {
         res.json({success:false, message: error.message})
         return;
       } else {
-        params.userId = user.id;
+        params.user = user.id;
         getReservations();
       }
     })
@@ -133,7 +133,7 @@ var functions = {
         return;
       } else {
         params = req.body;
-        params.userId = user.id;
+        params.user = user.id;
         verifyParams();
       }
     })
@@ -165,7 +165,7 @@ var functions = {
         return;
       } else {
         params = req.body;
-        params.userId = user.id;
+        params.user = user.id;
         verifyParams();
       }
     })
