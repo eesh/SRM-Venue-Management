@@ -6,7 +6,7 @@ var functions = {
 
   validateUser: function (token, callback) {
     function onUserFound(err, user) {
-      console.log("onUserFound", err, user);
+      //console.log("onUserFound", err, user);
       if(err) return callback(err, null)
       if(!user) return callback(new Error('No user found'), null);
       callback(null, user);
@@ -20,9 +20,10 @@ var functions = {
         callback(new Error('Auth Token expired'), null)
         return
       }
-      console.log("onAuthToken", authToken.user._id)
+      console.log("onAuthToken", authToken.user)
       User.findOne({ _id : authToken.user.id }, onUserFound)
     }
+    console.log(token);
     AuthToken.findOne({ 'token' : token }, onAuthToken)
   },
 
