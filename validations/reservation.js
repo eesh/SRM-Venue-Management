@@ -18,7 +18,7 @@ var functions = {
     },
 
     makeReservationValidation: function (params) {
-      if(params.venueId == null || params.user == null || params.startTime == null || params.endTime == null || params.duration == null || params.occasion == null) return false;
+      if(params.venueId == null || params.user == null || params.startTime == null || params.endTime == null || params.duration == null || params.occasion == null || params.capacity == null) return false;
       return true;
     },
 
