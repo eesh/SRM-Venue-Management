@@ -21,7 +21,7 @@ var functions = {
         return
       }
       console.log("onAuthToken", authToken.user)
-      User.findOne({ _id : authToken.user.id }, onUserFound)
+      User.findOne({ _id : authToken.user }, onUserFound)
     }
     console.log(token);
     AuthToken.findOne({ 'token' : token }, onAuthToken)
