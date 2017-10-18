@@ -20,7 +20,7 @@ var functions = {
         callback(new Error('Auth Token expired'), null)
         return
       }
-      console.log("onAuthToken", authToken.user.id)
+      console.log("onAuthToken", authToken.user._id)
       User.findOne({ _id : authToken.user.id }, onUserFound)
     }
     AuthToken.findOne({ 'token' : token }, onAuthToken)
