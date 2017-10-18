@@ -8,6 +8,7 @@ var ReservationSchema = new mongoose.Schema({
   endTime : Date,
   duration : Number,
   occasion : String,
+  capacity : Number,
   confirmed : Boolean
 });
 
