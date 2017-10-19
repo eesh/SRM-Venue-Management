@@ -20,7 +20,7 @@ var functions = {
   },
 
   cancelReservation: function (params, callback) {
-    Reservation.findOneAndRemove({id:params.reservationId}, function(err, reservation) {
+    Reservation.findOneAndRemove({_id:params.reservationId}, function(err, reservation) {
       if(err) {
         return callback(err, null);
       }
