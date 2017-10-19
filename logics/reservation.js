@@ -13,7 +13,9 @@ var functions = {
       if(!reservation) {
         return callback(new Error('Failed to make reservation'), null)
       }
-      callback(null, reservation);
+      Reservation.populate(reservation, { path: 'user', select:'_id name department' }, function (err, reservation) {
+        callback(null, reservation);
+      })
     });
   },
 
