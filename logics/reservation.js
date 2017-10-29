@@ -45,7 +45,14 @@ var functions = {
   editReservation : function (params, callback) {
     var id = params.reservationId
     delete params.reservationId
-    Reservation.findOneAndUpdate({_id : id}, { $set: params }, { new : true }, callback);
+    Reservation.findOneAndUpdate({_id : id}, { $set: params }, { new : true }, function (err, reservation) {
+      if(err) {
+        return callback(err, null);
+      }
+      Reservation.populate(reservation, { path: 'user', select:'_id name department'}, function (err, reservation) {
+        callback(null, reservation)
+      })
+    });
   }
 }
 

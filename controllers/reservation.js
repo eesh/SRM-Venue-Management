@@ -46,12 +46,12 @@ var functions = {
       return res.json({success : false, message : 'Invalid parameters'})
     }
     params = validations.sanitizeReservationFields(req.body);
-    ReservationLogics.editReservation(params, function (err, venue) {
+    ReservationLogics.editReservation(params, function (err, reservation) {
       if(err) {
         res.json({ success : false, message: err.message})
         return
       }
-      res.json({ success : true, reservationDetails: venue })
+      res.json({ success : true, reservationDetails: reservation })
     })
   },
 
