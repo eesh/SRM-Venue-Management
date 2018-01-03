@@ -4,7 +4,7 @@ const Auth = require('../models/AuthToken')
 var functions = {
 
   getUser: function (authToken, callback) {
-    if(token == null) {
+    if(authToken == null) {
       return res.json({ success : false, message : 'Unauthorized'})
     }
 
