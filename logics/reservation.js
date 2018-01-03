@@ -1,15 +1,12 @@
 const Reservation = require('../models/Reservation')
 const ReservationLog = require('../models/ReservationLog')
+const reservationConstants = require('../constants/reservation')
 
 // TODO: Check conflicting dates for reservation
 // TODO: Send notifications
 // TODO: Show rejection reason
 
-const constants = {
-    RESERVATION_PENDING : 0,
-    RESERVATION_CONFIRMED : 1,
-    RESERVATION_REJECTED : 2
-}
+
 
 var functions = {
 

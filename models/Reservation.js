@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const reservationConstants = require('../constants/reservation')
 
 var ReservationSchema = new mongoose.Schema({
   user : {
