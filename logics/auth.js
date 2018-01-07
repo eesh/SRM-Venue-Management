@@ -132,9 +132,9 @@ var functions = {
   isAdmin: function (token, callback) {
 
     function onTokenFound(authToken) {
-      User.findOne({id:authToken.user}, function (err, user) {
+      User.findOne({_id:authToken.user}, function (err, user) {
         if(err) {
-          callback(err);
+          callback(err, null);
           return;
         }
         if(!user) {
@@ -148,13 +148,13 @@ var functions = {
       })
     }
 
-    AuthToken.findOne({token : token}, function (err, authToken) {
+    AuthToken.findOne({'token' : token}, function (err, authToken) {
       if(err) {
-        callback(false);
+        callback(err, null);
         return;
       }
       if(!authToken) {
-        callback(false);
+        callback(new Error("No such token"), null);
         return;
       }
       onTokenFound(authToken);
