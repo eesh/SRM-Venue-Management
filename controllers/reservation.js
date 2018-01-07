@@ -159,7 +159,16 @@ var functions = {
       res.json({ success : false, message : 'Unauthorized'});
       return;
     }
-    AuthLogics.isAdmin(token, isAdmin);
+    AuthLogics.isAdmin(token, function (error, user) {
+      if(error != null) {
+        res.json({success:false, message: error.message});
+        return;
+      } else {
+        params = req.body;
+        params.user = user.id;
+        verifyParams();
+      }
+    });
 
     function verifyParams() {
       if(!validations.rejectReservationValidation(req.body)) {
@@ -175,19 +184,6 @@ var functions = {
         res.json({ success : true, 'reservationDetails' : reservation })
         return;
       });
-    }
-
-    function isAdmin(error, user) {
-      if(error != null) {
-        console.log(`isAdmin: ${error.message}`);
-        res.json({success:false, message: error.message});
-        return;
-      } else {
-        console.log(`else block in isAdmins`);
-        params = req.body;
-        params.user = user.id;
-        verifyParams();
-      }
     }
   }
 
