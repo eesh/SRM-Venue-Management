@@ -143,6 +143,7 @@ var functions = {
         }
         if(user.type != 'admin') {
           callback(new Error('Unauthorized'));
+          return;
         }
         callback(null, user);
       })

@@ -65,7 +65,7 @@ var functions = {
   confirmReservation : function (params, callback) {
     var id = params.reservationId
     delete params.reservationId
-    Reservation.findOneAndUpdate({_id : id}, { $set: { confirmed: constants.RESERVATION_CONFIRMED } }, { new : true}, function (err, reservation) {
+    Reservation.findOneAndUpdate({_id : id}, { $set: { confirmed: reservationConstants.RESERVATION_CONFIRMED } }, { new : true}, function (err, reservation) {
       if(err) {
         return callback(err, null);
       }
@@ -78,12 +78,14 @@ var functions = {
   rejectReservation : function (params, callback) {
     var id = params.reservationId
     delete params.reservationId
-    Reservation.findOneAndUpdate({_id : id}, { $set: { confirmed: constants.RESERVATION_REJECTED } }, { new : true}, function (err, reservation) {
+    Reservation.findOneAndUpdate({_id : id}, { $set: { confirmed: reservationConstants.RESERVATION_REJECTED } }, { new : true}, function (err, reservation) {
       if(err) {
-        return callback(err, null);
+        callback(err, null);
+        return;
       }
       Reservation.populate(reservation, { path: 'user', select:'_id name department'}, function (err, reservation) {
-        callback(null, reservation)
+        callback(null, reservation);
+        return;
       })
     })
   }

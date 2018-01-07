@@ -155,32 +155,39 @@ var functions = {
   rejectReservation: function (req, res) {
     var token = req.headers.token;
     var params = {};
-    if(token == null) {
-      return res.json({ success : false, message : 'Unauthorized'})
+    if(!token) {
+      res.json({ success : false, message : 'Unauthorized'});
+      return;
     }
-
-    AuthLogics.isAdmin(token, (error, user) => {
-      if(error) {
-        res.json({success:false, message: error.message})
-        return;
-      } else {
-        params = req.body;
-        params.user = user.id;
-        verifyParams();
-      }
-    })
+    AuthLogics.isAdmin(token, isAdmin);
 
     function verifyParams() {
       if(!validations.rejectReservationValidation(req.body)) {
-        return res.json({success:false, message: 'Missing parameters'});
+        res.json({success:false, message: 'Missing parameters'});
+        return;
       }
+
       ReservationLogics.rejectReservation(params, function (err, reservation) {
         if(err) {
-          return res.json({ success : false, message : err.message });
+          res.json({ success : false, message : err.message });
+          return;
         }
         res.json({ success : true, 'reservationDetails' : reservation })
         return;
       });
+    }
+
+    function isAdmin(error, user) {
+      if(error != null) {
+        console.log(`isAdmin: ${error.message}`);
+        res.json({success:false, message: error.message});
+        return;
+      } else {
+        console.log(`else block in isAdmins`);
+        params = req.body;
+        params.user = user.id;
+        verifyParams();
+      }
     }
   }
 
